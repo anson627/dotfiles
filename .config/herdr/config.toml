@@ -1,0 +1,4 @@
+onboarding = false
+
+[terminal]
+shell_mode = "login"

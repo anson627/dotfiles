@@ -1,0 +1,13 @@
+# osx
+.DS_Store
+
+# vim
+*~
+*.swp
+*.swo
+
+# python
+__pycache__
+
+# claude
+**/.claude/settings.local.json

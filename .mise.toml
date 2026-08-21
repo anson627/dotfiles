@@ -1,0 +1,16 @@
+[tools]
+claude = "latest"
+codex = "latest"
+fzf = "latest"
+gh = "latest"
+go = "latest"
+helm = "latest"
+herdr = "latest"
+kubectl = "latest"
+node = "lts"
+pi = "latest"
+uv = "latest"
+zoxide = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["go"]

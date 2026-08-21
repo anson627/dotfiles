@@ -1,0 +1,10 @@
+[color]
+    ui = auto
+[core]
+    excludesfile = ~/.gitignore_global
+    editor = vim
+[user]
+    email = anson627@gmail.com
+    name = Anson Qian
+[push]
+    autoSetupRemote = true
