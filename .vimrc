@@ -1,8 +1,13 @@
+set nocompatible " Use Vim defaults before loading plugins
+
 " -- Vim-plug --
 if empty(glob('~/.vim/autoload/plug.vim'))
     silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup PlugBootstrap
+        autocmd!
+        autocmd VimEnter * ++once PlugInstall --sync | source $MYVIMRC
+    augroup END
 endif
 
 call plug#begin('~/.vim/plugged')
@@ -17,25 +22,35 @@ call plug#end()
 
 " -- General --
 syntax on
-filetype on
-filetype plugin on
+filetype plugin indent on " Enable filetype settings and indentation
 
 set termguicolors " Enable true color
 colorscheme onedark " Set colorscheme
 
-set nocp " Enable features which are not Vi compatible
-set linebreak " Word wrap without line breaks
+set linebreak " Wrap at words without changing file contents
 set whichwrap=b,s,<,>,[,] " Wrap around at the beginning and end
 set hidden  " Hide buffers when they are abandoned
-set history=50 " Set preview window
-set laststatus=2 " Display status of last window
-set ruler " Display row and colum numbers
+set history=50 " Remember command and search history
+set laststatus=2 " Always show the status line
+set ruler " Display row and column numbers
 set showcmd " Show command in command line
 set showmode " Show mode in command line
 set clipboard=unnamed " Copy paste between windows
 set autoread " Auto reload file
 set number " Display line numbers
-set regexpengine=0 " Disable regex engine
+set scrolloff=5 " Keep context above and below the cursor
+set regexpengine=0 " Select the regex engine automatically
+
+" -- Reading --
+let g:markdown_fenced_languages = ['python', 'bash', 'json', 'yaml'] " Highlight code blocks
+augroup ReadingSettings
+    autocmd!
+    autocmd FileType python setlocal nowrap
+    autocmd FileType markdown setlocal wrap linebreak breakindent
+    " Move by displayed rows in prose; keep counted motions such as 5j
+    autocmd FileType markdown nnoremap <buffer> <expr> j v:count ? 'j' : 'gj'
+    autocmd FileType markdown nnoremap <buffer> <expr> k v:count ? 'k' : 'gk'
+augroup END
 
 " -- Indent -
 set autoindent
@@ -52,22 +67,8 @@ set hlsearch
 set ignorecase
 set smartcase
 
-" --- Shortcuts --
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
-
-nmap <Leader>n :setlocal number!<CR>
-nmap <Leader>p :set paste!<CR>
-
-" -- Coding Style --
-set cinoptions+=g0,j1
-set encoding=utf-8
-autocmd BufWritePre * :%s/\s\+$//e
-
 " -- FZF --
-let $FZF_DEFAULT_COMMAND = 'find . -type f -not -path "./.git/*"'
+let $FZF_DEFAULT_COMMAND = 'rg --files' " Respect ignore rules; omit hidden files
 let g:fzf_layout = { 'down': '~40%' }
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
@@ -85,13 +86,19 @@ let g:fzf_colors =
   \ 'header':  ['fg', 'Comment'] }
 let g:fzf_buffers_jump = 1
 let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
-nmap <Leader>b :Buffers<CR>
-nmap <Leader>c :Commits<CR>
-nmap <Leader>f :Files<CR>
 
 " -- NerdCommenter --
 let g:NERDSpaceDelims = 1
 
 " -- Fugitive --
-set statusline+=%{FugitiveStatusline()}
+" File path, modified/read-only flags, Git status, and cursor position
+set statusline=%f\ %m%r\ %{FugitiveStatusline()}%=%l:%c\ %p%%
+
+" --- Shortcuts --
+nnoremap <Leader>n :setlocal number!<CR>
+nnoremap <Leader>p :set paste!<CR>
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>c :Commits<CR>
+nnoremap <Leader>f :Files<CR>
+nnoremap <Leader>r :Rg<Space>
 
