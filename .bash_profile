@@ -2,7 +2,6 @@
 [ -f ~/.profile ] && . ~/.profile
 
 export EDITOR="vim"
-export MISE_GLOBAL_CONFIG_FILE="$HOME/.mise.toml"
 
 # Idempotent, so an inheriting child shell can't stack duplicate entries.
 path_prepend() {
@@ -77,11 +76,11 @@ alias claude='claude --dangerously-skip-permissions'
 alias codex='codex --yolo'
 
 # Source a tool's shell hook from a cache instead of paying the tool's own
-# startup cost; install.sh warms the same files. Stale once .mise.toml moves.
+# startup cost; install.sh warms the same files. Stale once the mise config moves.
 cached_init() {
     local f=$HOME/.cache/bash-init/$1.bash
     shift
-    if [ ! -s "$f" ] || [ "$HOME/.mise.toml" -nt "$f" ]; then
+    if [ ! -s "$f" ] || [ "$HOME/.config/mise/config.toml" -nt "$f" ]; then
         command -v "$1" > /dev/null || return 0
         mkdir -p "${f%/*}" && "$@" > "$f" || return 0
     fi

@@ -4,7 +4,6 @@
 export EDITOR="vim"
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagacad
-export MISE_GLOBAL_CONFIG_FILE="$HOME/.mise.toml"
 
 # Idempotent, so a nested shell can't stack duplicate entries. /etc/zprofile has
 # already run path_helper by this point, so these land in front of it.
@@ -77,11 +76,11 @@ alias claude='claude --dangerously-skip-permissions'
 alias codex='codex --yolo'
 
 # Source a tool's shell hook from a cache instead of paying the tool's own
-# startup cost; install.sh warms the same files. Stale once .mise.toml moves.
+# startup cost; install.sh warms the same files. Stale once the mise config moves.
 cached_init() {
     local f=$HOME/.cache/zsh-init/$1.zsh
     shift
-    if [ ! -s "$f" ] || [ "$HOME/.mise.toml" -nt "$f" ]; then
+    if [ ! -s "$f" ] || [ "$HOME/.config/mise/config.toml" -nt "$f" ]; then
         command -v "$1" > /dev/null || return 0
         mkdir -p "${f%/*}" && "$@" > "$f" || return 0
     fi

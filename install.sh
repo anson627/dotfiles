@@ -10,9 +10,17 @@ case $os in
     Linux)  shell=bash links=".bash_profile" ;;
     *) echo "unsupported OS: $os" >&2; exit 1 ;;
 esac
-links="$links .gitconfig .gitignore_global .mise.toml .vimrc .config/herdr/config.toml"
+links="$links .gitconfig .gitignore_global .vimrc .config/herdr/config.toml"
+links="$links .config/mise/config.toml .config/mise/config.personal.toml"
 
 # --- links -----------------------------------------------------------------
+
+# The mise config used to be linked at ~/.mise.toml. Left behind, that link
+# dangles and mise would still find it walking up from anywhere under $HOME.
+if [ -L "$HOME/.mise.toml" ] && [ "$(readlink "$HOME/.mise.toml")" = "$repo/.mise.toml" ]; then
+    rm "$HOME/.mise.toml"
+    echo "removed stale ~/.mise.toml link"
+fi
 
 for f in $links; do
     [ -e "$repo/$f" ] || continue
@@ -40,7 +48,7 @@ done
 # Command Line Tools are the only thing macOS needs from outside mise: they are
 # the sole source of git (and of cc, for the odd tool mise builds instead of
 # downloading). No Homebrew -- everything it used to carry here, gh included,
-# now comes from .mise.toml, which is also what the Linux box uses.
+# now comes from the mise config, which is also what the Linux box uses.
 if [ "$os" = Darwin ] && ! xcode-select -p > /dev/null 2>&1; then
     xcode-select --install || true   # a GUI installer; can't be scripted
     echo "installing Command Line Tools -- re-run this script once it finishes" >&2
@@ -50,7 +58,13 @@ fi
 # --- toolchain -------------------------------------------------------------
 
 export PATH="$HOME/.local/bin:$PATH"
-export MISE_GLOBAL_CONFIG_FILE="$HOME/.mise.toml"
+# A shell started from the old rc files still points mise at ~/.mise.toml.
+unset MISE_GLOBAL_CONFIG_FILE
+# ~/.profile is where a machine opts into extra tools (MISE_ENV=personal pulls
+# in config.personal.toml); the rc files source it too, so shims agree.
+if [ -f "$HOME/.profile" ]; then
+    set +u; . "$HOME/.profile"; set -u
+fi
 
 if ! command -v mise > /dev/null 2>&1; then
     curl -fsSL https://mise.run | sh

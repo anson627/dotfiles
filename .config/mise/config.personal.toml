@@ -1,0 +1,12 @@
+# Personal laptop only -- loaded on top of config.toml when MISE_ENV=personal
+# (set it in ~/.profile). The work laptop leaves MISE_ENV unset.
+[tools]
+aws-cli = { version = "latest", symlink_bins = "true" }
+
+[tools."http:android-platform-tools"]
+version = "latest"
+url = 'https://dl.google.com/android/repository/platform-tools_r{{ version }}-{{ os(macos="darwin", windows="win") }}.zip'
+version_list_url = "https://dl.google.com/android/repository/repository2-3.xml"
+version_regex = 'platform-tools_r(\d+\.\d+\.\d+)-'
+version_order = "semver"
+strip_components = 1
