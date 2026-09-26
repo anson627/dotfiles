@@ -15,13 +15,6 @@ links="$links .config/mise/config.toml .config/mise/config.personal.toml"
 
 # --- links -----------------------------------------------------------------
 
-# The mise config used to be linked at ~/.mise.toml. Left behind, that link
-# dangles and mise would still find it walking up from anywhere under $HOME.
-if [ -L "$HOME/.mise.toml" ] && [ "$(readlink "$HOME/.mise.toml")" = "$repo/.mise.toml" ]; then
-    rm "$HOME/.mise.toml"
-    echo "removed stale ~/.mise.toml link"
-fi
-
 for f in $links; do
     [ -e "$repo/$f" ] || continue
     target=$HOME/$f
@@ -58,8 +51,7 @@ fi
 # --- toolchain -------------------------------------------------------------
 
 export PATH="$HOME/.local/bin:$PATH"
-# A shell started from the old rc files still points mise at ~/.mise.toml.
-unset MISE_GLOBAL_CONFIG_FILE
+
 # ~/.profile is where a machine opts into extra tools (MISE_ENV=personal pulls
 # in config.personal.toml); the rc files source it too, so shims agree.
 if [ -f "$HOME/.profile" ]; then
