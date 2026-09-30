@@ -102,3 +102,20 @@ nnoremap <Leader>c :Commits<CR>
 nnoremap <Leader>f :Files<CR>
 nnoremap <Leader>r :Rg<Space>
 
+function! s:RunInFileDir(cmd) abort
+    update
+    let l:dir = expand('%:p:h')
+    if exists('s:run_buf') && bufexists(s:run_buf)
+        execute 'bwipeout! ' . s:run_buf " Replace the previous run's output
+    endif
+    execute 'botright ' . float2nr(&lines * 0.4) . 'new'
+    let s:run_buf = term_start(['/bin/sh', '-c', a:cmd], {'cwd': l:dir, 'curwin': 1, 'term_name': a:cmd})
+    setlocal nonumber
+    tnoremap <buffer> <silent> <Esc> <C-\><C-n>:bwipeout!<CR>
+    nnoremap <buffer> <silent> <Esc> :bwipeout!<CR>
+endfunction
+" Test runner: always print coverage for the Python files under the test dir
+nnoremap <Leader>t :call <SID>RunInFileDir('pytest --cov=. --cov-report=term-missing ' . shellescape(expand('%:p')) . ' .')<CR>
+nnoremap <Leader>l :call <SID>RunInFileDir('ruff check . && ruff format --check .')<CR>
+nnoremap <Leader>m :call <SID>RunInFileDir('python main.py')<CR>
+nnoremap <Leader>g :call <SID>RunInFileDir('glow -w ' . &columns . ' ' . shellescape(expand('%:p')))<CR>
