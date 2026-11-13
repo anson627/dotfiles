@@ -7,7 +7,7 @@ os=$(uname -s)
 
 case $os in
     Darwin) shell=zsh  links=".zshrc" ;;
-    Linux)  shell=bash links=".bash_profile" ;;
+    Linux)  shell=bash links=".bash_profile .bashrc" ;;
     *) echo "unsupported OS: $os" >&2; exit 1 ;;
 esac
 links="$links .gitconfig .gitignore_global .vimrc .config/herdr/config.toml"
@@ -78,6 +78,7 @@ warm() {
 }
 warm zoxide init "$shell"
 warm fzf "--$shell"
+warm direnv hook "$shell"
 
 echo "warmed $cache"
 

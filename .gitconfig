@@ -4,7 +4,7 @@
     excludesfile = ~/.gitignore_global
     editor = vim
 [user]
-    email = anson627@gmail.com
+    email = 1474346+anson627@users.noreply.github.com
     name = Anson Qian
 [push]
     autoSetupRemote = true

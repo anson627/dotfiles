@@ -88,6 +88,7 @@ cached_init() {
 }
 cached_init zoxide zoxide init bash
 cached_init fzf fzf --bash
+cached_init direnv direnv hook bash
 
 if [ -r /usr/share/bash-completion/completions/git ]; then
     . /usr/share/bash-completion/completions/git
