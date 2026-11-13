@@ -22,8 +22,12 @@ path_prepend() {
         *) PATH="$1:$PATH" ;;
     esac
 }
-path_prepend "$HOME/.local/bin"
+# ~/.local/bin goes first: Coder startup scripts run as login shells, and the
+# template's direnv installer drops its binary into the first writable PATH
+# entry. With mise's shims first, `mise install` (from install.sh, running at
+# the same time) rebuilds that directory underneath it and the start fails.
 path_prepend "$HOME/.local/share/mise/shims"
+path_prepend "$HOME/.local/bin"
 export PATH
 
 # Everything below is interactive-only
