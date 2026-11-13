@@ -3,6 +3,18 @@
 
 export EDITOR="vim"
 
+# Use gh's own login (~/.config/gh/hosts.yml), not the token Coder injects: the
+# workspace's gh-token-refresh hook (from /etc/profile.d and /etc/bash.bashrc)
+# keeps re-exporting GITHUB_TOKEN from external auth over it. Drop the token,
+# the function and its PROMPT_COMMAND entry -- removing only the function
+# would leave every prompt printing "_gh_token_refresh: command not found".
+unset GH_TOKEN GITHUB_TOKEN
+unset -f _gh_token_refresh 2> /dev/null
+if [ -n "${PROMPT_COMMAND-}" ]; then
+    PROMPT_COMMAND=${PROMPT_COMMAND//_gh_token_refresh;/}
+    PROMPT_COMMAND=${PROMPT_COMMAND//_gh_token_refresh/}
+fi
+
 # Idempotent, so an inheriting child shell can't stack duplicate entries.
 path_prepend() {
     case ":$PATH:" in
