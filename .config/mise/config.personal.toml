@@ -1,7 +1,22 @@
-# Personal laptop only -- loaded on top of config.toml when MISE_ENV=personal
-# (set it in ~/.profile). The work laptop leaves MISE_ENV unset.
+# Personal laptop -- linked as ~/.config/mise/config.toml by `install.sh personal`.
+# Standalone: nothing is shared with config.coreweave.toml.
 [tools]
 aws-cli = { version = "latest", symlink_bins = "true" }
+claude-code = "latest"
+codex = "latest"
+fzf = "latest"
+gh = "latest"
+glow = "latest"
+go = "latest"
+helm = "latest"
+herdr = "latest"
+kubectl = "latest"
+node = "lts"
+python = "latest"
+ripgrep = "latest"
+rust = "latest"
+uv = "latest"
+zoxide = "latest"
 
 [tools."http:android-platform-tools"]
 version = "latest"

@@ -2,6 +2,10 @@
 
 set -eu
 
+# Which mise tool set this machine gets: ./install.sh [coreweave|personal].
+# The chosen .config/mise/config.<env>.toml is linked as ~/.config/mise/config.toml.
+MISE_ENV=${1:-coreweave}
+
 repo=$(cd "$(dirname "$0")" && pwd)
 os=$(uname -s)
 
@@ -11,12 +15,20 @@ case $os in
     *) echo "unsupported OS: $os" >&2; exit 1 ;;
 esac
 links="$links .gitconfig .gitignore_global .vimrc .config/herdr/config.toml"
-links="$links .config/mise/config.toml .config/mise/config.personal.toml"
+# src=dest: link a repo file under a different name in $HOME.
+links="$links .config/mise/config.$MISE_ENV.toml=.config/mise/config.toml"
+
+if [ ! -e "$repo/.config/mise/config.$MISE_ENV.toml" ]; then
+    echo "unknown MISE_ENV: $MISE_ENV (no .config/mise/config.$MISE_ENV.toml)" >&2
+    exit 1
+fi
 
 # --- links -----------------------------------------------------------------
 
 for f in $links; do
-    [ -e "$repo/$f" ] || continue
+    src=${f%%=*}
+    f=${f#*=}
+    [ -e "$repo/$src" ] || continue
     target=$HOME/$f
     # Nested entries (.config/...) need their parent before ln can land there.
     case $f in */*) mkdir -p "${target%/*}" ;; esac
@@ -29,8 +41,8 @@ for f in $links; do
         mv "$target" "$backup"
         echo "kept existing ~/$f as ${backup##*/}"
     fi
-    if ln -sfn "$repo/$f" "$target"; then
-        echo "linked ~/$f -> $repo/$f"
+    if ln -sfn "$repo/$src" "$target"; then
+        echo "linked ~/$f -> $repo/$src"
     else
         echo "WARNING: could not link ~/$f" >&2   # never block the toolchain bootstrap
     fi
@@ -52,8 +64,7 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# ~/.profile is where a machine opts into extra tools (MISE_ENV=personal pulls
-# in config.personal.toml); the rc files source it too, so shims agree.
+# Machine-local environment; the rc files source it too, so shims agree.
 if [ -f "$HOME/.profile" ]; then
     set +u; . "$HOME/.profile"; set -u
 fi
